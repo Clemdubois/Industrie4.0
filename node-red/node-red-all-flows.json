@@ -1,0 +1,628 @@
+[
+    {
+        "id": "5fc4aadb853a9b17",
+        "type": "tab",
+        "label": "node-red-raspberry",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "839f661c8d2690ab",
+        "type": "tab",
+        "label": "HiveMQ",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "23a49d1cb37ff5cf",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.1.4",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "175ebfcd519d0f1c",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "5f95476bad844cc696212fd407b7fd62.s1.eu.hivemq.cloud",
+        "port": "8883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "5",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "13f96ca11fe07116",
+        "type": "protobuf-file",
+        "protopath": "C:\\Users\\yoang\\Desktop\\ESIEA\\5A\\Solutions Numériques pour l'Industrie 4.0\\TP\\node-red\\sparkplug_b.proto",
+        "watchFile": true,
+        "keepCase": false
+    },
+    {
+        "id": "faac6e3cda321b4e",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.1.3",
+        "port": "1883",
+        "tls": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "5",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a268803a44772579",
+        "type": "mqtt in",
+        "z": "5fc4aadb853a9b17",
+        "name": "BROKER Rpi",
+        "topic": "ESIEA/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "23a49d1cb37ff5cf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 290,
+        "y": 460,
+        "wires": [
+            [
+                "d523ad68e40d9796",
+                "dd44cf80b8cfe51b"
+            ]
+        ]
+    },
+    {
+        "id": "d523ad68e40d9796",
+        "type": "function",
+        "z": "5fc4aadb853a9b17",
+        "name": "defineTopic",
+        "func": "const topicArray = [\"spBv1.0\",\"\",\"DDATA\",\"raspberry\",\"esp8266\"];\ntopicArray[1] = msg.topic.split('/')[1];\nmsg.topic = topicArray.join('/');\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 340,
+        "wires": [
+            [
+                "7cb555241a660982"
+            ]
+        ]
+    },
+    {
+        "id": "40cc3af9e3a8d1ea",
+        "type": "encode",
+        "z": "5fc4aadb853a9b17",
+        "name": "",
+        "protofile": "13f96ca11fe07116",
+        "protoType": "Payload",
+        "x": 840,
+        "y": 460,
+        "wires": [
+            [
+                "deb006dabe3290e3",
+                "8ff831dd63195004",
+                "8594a86fb70b5016"
+            ]
+        ]
+    },
+    {
+        "id": "deb006dabe3290e3",
+        "type": "decode",
+        "z": "5fc4aadb853a9b17",
+        "name": "",
+        "protofile": "13f96ca11fe07116",
+        "protoType": "Payload",
+        "x": 840,
+        "y": 540,
+        "wires": [
+            [
+                "3bcd34f60d4b0910"
+            ]
+        ]
+    },
+    {
+        "id": "7cb555241a660982",
+        "type": "function",
+        "z": "5fc4aadb853a9b17",
+        "name": "formatData",
+        "func": "const json = `[\\\n    {\\\n        \\\"name\\\":\\ \\\"humidity\\\",\\\n        \\\"doubleValue\\\": ${msg.payload.humidity}\\\n    },\\\n    {\\\n        \\\"name\\\": \\\"temperature\\\",\\\n        \\\"doubleValue\\\": ${msg.payload.temperature}\\\n    }\\\n]`;\ndelete (msg.payload.humidity)\ndelete (msg.payload.temperature)\nmsg.payload.metrics = JSON.parse(json);\nmsg.retain = true;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 460,
+        "wires": [
+            [
+                "40cc3af9e3a8d1ea",
+                "97ea5ff291294189"
+            ]
+        ]
+    },
+    {
+        "id": "3c5631fe59521d6c",
+        "type": "function",
+        "z": "5fc4aadb853a9b17",
+        "name": "generateInput",
+        "func": "const topic = \"ESIEA/grp3\";\nconst humidity = Math.round(Math.random()*1000)/10;\nconst temperature = Math.round(Math.random() * 600) / 10;\nmsg.topic = topic;\nmsg.payload = {};\nmsg.payload.humidity = humidity;\nmsg.payload.temperature = temperature;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 340,
+        "wires": [
+            [
+                "d523ad68e40d9796",
+                "dd44cf80b8cfe51b"
+            ]
+        ]
+    },
+    {
+        "id": "b9fbb55738e4acde",
+        "type": "inject",
+        "z": "5fc4aadb853a9b17",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 340,
+        "wires": [
+            [
+                "3c5631fe59521d6c"
+            ]
+        ]
+    },
+    {
+        "id": "97ea5ff291294189",
+        "type": "debug",
+        "z": "5fc4aadb853a9b17",
+        "name": "Output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 850,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "067e17c59ec434c0",
+        "type": "mqtt in",
+        "z": "5fc4aadb853a9b17",
+        "name": "Rio",
+        "topic": "#",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "faac6e3cda321b4e",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 310,
+        "y": 660,
+        "wires": [
+            [
+                "fd50643e7089f405"
+            ]
+        ]
+    },
+    {
+        "id": "dd44cf80b8cfe51b",
+        "type": "debug",
+        "z": "5fc4aadb853a9b17",
+        "name": "Input",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 550,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "fd50643e7089f405",
+        "type": "decode",
+        "z": "5fc4aadb853a9b17",
+        "name": "",
+        "protofile": "13f96ca11fe07116",
+        "protoType": "Payload",
+        "x": 500,
+        "y": 660,
+        "wires": [
+            [
+                "0c7c44a95f45475b"
+            ]
+        ]
+    },
+    {
+        "id": "0c7c44a95f45475b",
+        "type": "debug",
+        "z": "5fc4aadb853a9b17",
+        "name": "DecodeSPBInput",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "3bcd34f60d4b0910",
+        "type": "debug",
+        "z": "5fc4aadb853a9b17",
+        "name": "Decode",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "8ff831dd63195004",
+        "type": "debug",
+        "z": "5fc4aadb853a9b17",
+        "name": "Encode",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "8594a86fb70b5016",
+        "type": "mqtt out",
+        "z": "5fc4aadb853a9b17",
+        "name": "Rio",
+        "topic": "",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "faac6e3cda321b4e",
+        "x": 1110,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "e6787f4f13aaf764",
+        "type": "function",
+        "z": "839f661c8d2690ab",
+        "name": "defineTopic",
+        "func": "const topicArray = [\"spBv1.0\",\"\",\"DDATA\",\"raspberry\",\"esp8266\"];\ntopicArray[1] = msg.topic.split('/')[1];\nmsg.topic = topicArray.join('/');\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 280,
+        "wires": [
+            [
+                "fb348a9b1452ba38"
+            ]
+        ]
+    },
+    {
+        "id": "80d02c9fca3649c7",
+        "type": "encode",
+        "z": "839f661c8d2690ab",
+        "name": "",
+        "protofile": "13f96ca11fe07116",
+        "protoType": "Payload",
+        "x": 960,
+        "y": 400,
+        "wires": [
+            [
+                "ec3e1589851ac2c6",
+                "5344da2b78df662c",
+                "8126bc641626e9c7"
+            ]
+        ]
+    },
+    {
+        "id": "ec3e1589851ac2c6",
+        "type": "decode",
+        "z": "839f661c8d2690ab",
+        "name": "",
+        "protofile": "13f96ca11fe07116",
+        "protoType": "Payload",
+        "x": 960,
+        "y": 480,
+        "wires": [
+            [
+                "cb716b9bc27e45e0"
+            ]
+        ]
+    },
+    {
+        "id": "fb348a9b1452ba38",
+        "type": "function",
+        "z": "839f661c8d2690ab",
+        "name": "formatData",
+        "func": "const json = `[\\\n    {\\\n        \\\"name\\\":\\ \\\"humidity\\\",\\\n        \\\"doubleValue\\\": ${msg.payload.humidity}\\\n    },\\\n    {\\\n        \\\"name\\\": \\\"temperature\\\",\\\n        \\\"doubleValue\\\": ${msg.payload.temperature}\\\n    }\\\n]`;\ndelete (msg.payload.humidity)\ndelete (msg.payload.temperature)\nmsg.payload.metrics = JSON.parse(json);\nmsg.retain = true;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 400,
+        "wires": [
+            [
+                "80d02c9fca3649c7",
+                "ddee7451010af936"
+            ]
+        ]
+    },
+    {
+        "id": "5344da2b78df662c",
+        "type": "mqtt out",
+        "z": "839f661c8d2690ab",
+        "name": "HiveMQ",
+        "topic": "",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "175ebfcd519d0f1c",
+        "x": 1240,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "6967f3f8581cd00d",
+        "type": "function",
+        "z": "839f661c8d2690ab",
+        "name": "generateInput",
+        "func": "const topic = \"ESIEA/grp3\";\nconst humidity = Math.round(Math.random()*1000)/10;\nconst temperature = Math.round(Math.random() * 600) / 10;\nmsg.topic = topic;\nmsg.payload = {};\nmsg.payload.humidity = humidity;\nmsg.payload.temperature = temperature;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 280,
+        "wires": [
+            [
+                "e6787f4f13aaf764",
+                "9e5d19128f2af7a5"
+            ]
+        ]
+    },
+    {
+        "id": "3e7e05757ef87f32",
+        "type": "inject",
+        "z": "839f661c8d2690ab",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 230,
+        "y": 280,
+        "wires": [
+            [
+                "6967f3f8581cd00d"
+            ]
+        ]
+    },
+    {
+        "id": "ddee7451010af936",
+        "type": "debug",
+        "z": "839f661c8d2690ab",
+        "name": "debugOutput",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "1c46ea3f820f8c4a",
+        "type": "mqtt in",
+        "z": "839f661c8d2690ab",
+        "name": "HiveMQ",
+        "topic": "#",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "175ebfcd519d0f1c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 400,
+        "y": 600,
+        "wires": [
+            [
+                "d09eb39486818e55"
+            ]
+        ]
+    },
+    {
+        "id": "9e5d19128f2af7a5",
+        "type": "debug",
+        "z": "839f661c8d2690ab",
+        "name": "debugInput",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "d09eb39486818e55",
+        "type": "decode",
+        "z": "839f661c8d2690ab",
+        "name": "",
+        "protofile": "13f96ca11fe07116",
+        "protoType": "Payload",
+        "x": 580,
+        "y": 600,
+        "wires": [
+            [
+                "701939a0d5aa95aa"
+            ]
+        ]
+    },
+    {
+        "id": "701939a0d5aa95aa",
+        "type": "debug",
+        "z": "839f661c8d2690ab",
+        "name": "debugHiveMQInput",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "cb716b9bc27e45e0",
+        "type": "debug",
+        "z": "839f661c8d2690ab",
+        "name": "debugDecode",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "8126bc641626e9c7",
+        "type": "debug",
+        "z": "839f661c8d2690ab",
+        "name": "debugEncode",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 280,
+        "wires": []
+    }
+]

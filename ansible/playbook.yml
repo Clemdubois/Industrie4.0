@@ -1,0 +1,30 @@
+---
+- name: Install mosquitto on Rpi
+  hosts: all
+  remote_user: pi
+  become: yes
+  
+  tasks:
+  - name: Copy Mosquitto files
+    copy:
+      src: /tmp/mosquitto-2.0.15.tar.gz
+      dest: /tmp/mosquitto.tar.gz
+  
+  - name: unarchive Mosquitto
+    ansible.builtin.unarchive:
+      src: /tmp/mosquitto.tar.gz
+      dest: /tmp/
+
+  - name: Build Mosquitto
+    command: /usr/bin/make -C /tmp/mosquitto-2.0.15/ binary WITH_CJSON=no WITH_TLS=no
+  
+  - name: Copy binary to sbin
+    ansible.builtin.copy:
+      src: /tmp/mosquitto-2.0.15/src/mosquitto
+      dest: /usr/sbin/
+
+  - name: Start Mosquitto as service and enable to start on boot
+    service:
+      name: mosquitto
+      state: started
+      enabled: yes
